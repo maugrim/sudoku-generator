@@ -5,6 +5,7 @@ Playground for generating valid Sudoku boards (Russel's interview question.)
 import argparse
 import random
 import logging
+import math
 
 def union(*iterables):
     "Return a set that is the union of all the given iterables."
@@ -80,9 +81,12 @@ def generate_board(dimension):
     empty_board = [[None for _ in range(n)] for _ in range(n)]
     return complete_board(empty_board, n, dimension, 0, 0)
 
-def format_board(board):
+def format_board(board, dimension):
     "Returns a formatted representation of the board, one row per line."
-    return "\n".join("[{}]".format(", ".join(map(str, row))) for row in board)
+    value_length = int(math.ceil(math.log10(dimension ** 2)))
+    def format_value(val):
+        return str(val).rjust(value_length)
+    return "\n".join("[{}]".format(", ".join(map(format_value, row))) for row in board)
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
@@ -95,4 +99,4 @@ if __name__ == "__main__":
     if not board:
         print "Couldn't generate a valid board."
     else:
-        print format_board(board)
+        print format_board(board, args.dimension)
