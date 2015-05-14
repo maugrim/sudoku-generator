@@ -4,6 +4,7 @@ Playground for generating valid Sudoku boards (Russel's interview question.)
 """
 import argparse
 import random
+import logging
 
 def union(*iterables):
     "Return a set that is the union of all the given iterables."
@@ -60,9 +61,11 @@ def complete_board(board, n, dimension, x, y):
             if completion:
                 return completion
             else:
+                logging.debug("Failed to place {} in slot ({}, {}); available candidates are {}.".format(val, x, y, candidates))
                 board[y][x] = None
 
     # nothing worked
+    logging.debug("Gave up on filling slot ({}, {}) with candidates {}; backtracking.".format(x, y, candidates))
     return None
 
 def generate_board(dimension):
@@ -84,7 +87,10 @@ def format_board(board):
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     parser.add_argument("dimension", type=int, help="The dimension of the board (e.g. 3 makes a 9x9 board.)")
+    parser.add_argument('--verbose', '-v', action='count', help="Whether to include verbose debugging output.")
     args = parser.parse_args()
+    logging.basicConfig(level=logging.DEBUG if args.verbose else logging.INFO)
+
     board = generate_board(args.dimension)
     if not board:
         print "Couldn't generate a valid board."
